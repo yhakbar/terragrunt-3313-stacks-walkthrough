@@ -33,7 +33,13 @@ Some typical issues that folks run into when trying to scale up infrastructure u
 
    This can also be slow, as you might not want OpenTofu to compute a plan for all of your infrastructure every time you make a change to any of it.
 
-2. The ability to execute side-effects is limited.
+2. It can be complicated to work across different pieces of state.
+
+   If you have infrastructure manually segmented across different directories of `.tf` files, it can be difficult to coordinate changes across them.
+
+   You may have to leverage something like [terraform_remote_state](https://opentofu.org/docs/language/state/remote-state-data/) to access state from one piece of infrastructure in another. This can be complicated to manage, as the particulars of how that state is stored ends up in the `.tf` files themselves, coupling their configurations together. There is also no guarantee that updates will occur in the correct order, so users have to manually ensure that dependencies are updated before the dependent infrastructure, to ensure that the dependent infrastructure is reading the correct state.
+
+3. The ability to execute side-effects is limited.
 
    OpenTofu is great for managing updates to infrastructure state, but it's not great for managing the side-effects of infrastructure changes.
 
