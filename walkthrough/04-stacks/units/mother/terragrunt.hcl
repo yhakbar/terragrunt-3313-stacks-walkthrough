@@ -6,8 +6,7 @@ terraform {
 	source = "${get_repo_root()}/walkthrough/01-tofu/modules/chicken"
 }
 
-inputs = {
-	first_name = "Mrs."
-	last_name  = "Chicken"
+include "inputs" {
+	path = find_in_parent_folders("mother.inputs.hcl")
 }
 

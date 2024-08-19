@@ -9,6 +9,7 @@ In a nutshell, it lets you represent the infrastructure you want in files that e
 To use this part of the walkthrough, run the following in this directory:
 
 ```bash
+tofu init
 tofu apply -var first_name=Foghorn -var last_name=Leghorn
 ```
 
