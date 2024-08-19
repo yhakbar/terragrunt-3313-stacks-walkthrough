@@ -9,7 +9,7 @@ In a nutshell, it lets you represent the infrastructure you want in files that e
 To use this part of the walkthrough, run the following in this directory:
 
 ```bash
-tofu apply
+tofu apply -var first_name=Foghorn -var last_name=Leghorn
 ```
 
 You'll see a plan of what will be done, and then you can confirm that you want to apply the changes.
@@ -22,7 +22,7 @@ This is the basic idea behind Infrastructure as Code (IaC).
 
 This is a very basic example, and it's not very useful in practice. It's just to show the basic idea of how OpenTofu works.
 
-The core issues that folks run into when trying to scale up infrastructure only using OpenTofu are:
+Some typical issues that folks run into when trying to scale up infrastructure using only OpenTofu are:
 
 1. Operations are generally all or nothing.
 
@@ -30,9 +30,18 @@ The core issues that folks run into when trying to scale up infrastructure only 
 
    This results in a large blast radius for changes, and can make it difficult to safely make changes to infrastructure without downtime.
 
+   This can also be slow, as you might not want OpenTofu to compute a plan for all of your infrastructure every time you make a change to any of it.
+
 2. The ability to execute side-effects is limited.
 
    OpenTofu is great for managing updates to infrastructure state, but it's not great for managing the side-effects of infrastructure changes.
 
-   For example, if you want to build 
+   For example, if you want to build a container image and push to a registry before updating a Kubernetes deployment, you'd typically use a different tool to manage that process.
+
+There are some other issues, but for the purposes of this walkthrough, these are the important ones. 
+
+## Next Step
+
+The [next walkthrough](../02-terragrunt) explores Terragrunt, and how it addresses some of these.
+
 
