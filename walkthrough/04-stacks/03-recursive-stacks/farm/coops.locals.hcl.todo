@@ -1,0 +1,26 @@
+locals {
+	coop-1 = {
+		mother = {
+			first_name = "Mother"
+			last_name  = "First"
+		}
+
+		father = {
+			first_name = "Father"
+			last_name  = "First"
+		}
+	}
+
+	coop-2 = {
+		mother = {
+			first_name = "Mother"
+			last_name  = "Second"
+		}
+
+		father = {
+			first_name = "Father"
+			last_name  = "Second"
+		}
+	}
+		
+}

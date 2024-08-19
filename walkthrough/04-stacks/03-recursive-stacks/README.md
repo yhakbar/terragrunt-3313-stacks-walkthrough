@@ -72,3 +72,37 @@ This provides a mechanism for encapsulation, as you can see that the `coop-1` an
 
 It also provides a mechanism for atomic updates to Stacks. Given that the entirety of the definition for a stack is stored elsewhere, it's possible to update the entire Stack by changing the value of the `source` attribute in the `terragrunt.stack.hcl` file, rather than editing individual `terragrunt.hcl` files.
 
+As an excercise, let's adjust the `source` attribute in the `coop_1` and `coop_2` configuration blocks so that they point to the `../../stacks/dynamic-coop` directory, and then re-run the `./mock-stack-render.sh` command.
+
+Next, take a look at the error that occurs when running the `terragrunt run-all apply --terragrunt-non-interactive` command.
+
+You should see an error that includes the following:
+
+```
+Call to function "find_in_parent_folders" failed: ParentFileNotFoundError: Could not find a coops.locals.hcl in any of the parent folders
+```
+
+This is one of the downsides to the design discussed in [the last chapter](../02-dynamicity/README.md). Re-usable configurations may have certain expectations regarding how they will be instantiated, and there is no obvious interface for what they expect. One has to read the `terragrunt.hcl` file and reason about what is required to instantiate it.
+
+It's not clear that there's a way to handle this without some kind of interface that can be defined for `terragrunt.hcl` files, which can be inspected to determine what is required to instantiate them. This may also result in configurations that are unique to `terragrunt.hcl` files that are used in Stacks, which sacrifices some of the advantages of the current design.
+
+To resolve this error, you can copy the file [coops.locals.hcl.todo](./farm/coops.locals.hcl.todo) to `./farm/coops.locals.hcl`:
+
+```bash
+mv farm/coops.locals.hcl.todo farm/coops.locals.hcl
+```
+
+Once that's done, you can re-run the apply, which should work now:
+
+```bash
+terragrunt run-all apply --terragrunt-non-interactive
+```
+
+You shouldn't have any errors anymore, and should see names for the chickens that align with the `coops.locals.hcl` file.
+
+## Feedback Requested
+
+How do you feel about this trade-off? Is there another approach to defining the interface more cleanly that you would like to see?
+
+Do you see the current design as something that you would be able to work with in your own infrastructure, or do you see it as something that would block adoption of Stacks?
+

@@ -1,9 +1,9 @@
 locals {
-	coops = read_terraform_config("coops.inputs.hcl").locals
-	current_directory = "${basename(get_terragrunt_dir())}"
+	coops = read_terragrunt_config(find_in_parent_folders("coops.locals.hcl")).locals
+	stack_name = "${basename(dirname(find_in_parent_folders("terragrunt.stack.hcl")))}"
 
-	first_name = local.coops[current_directory].first_name
-	last_name = local.coops[current_directory].last_name
+	first_name = local.coops[local.stack_name].father.first_name
+	last_name = local.coops[local.stack_name].father.last_name
 }
 
 inputs = {
