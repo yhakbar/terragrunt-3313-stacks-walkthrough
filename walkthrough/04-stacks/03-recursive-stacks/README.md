@@ -2,7 +2,7 @@
 
 So far, the walkthroughs have only delved into how to use Stacks to manage Units. This chapter will demonstrate how to use Stacks to manage other Stacks.
 
-Take a look at the Stack defined in the [farm](./farm) directory. It's a Stack that manages the `coop-1` Stack, and the `coop-2` Stack:
+Take a look at the Stack defined in the [farm](./farm) directory. It's a Stack that manages two Stacks: `coop_1` and `coop-2`.
 
 ```hcl
 stack "coop_1" {
@@ -23,7 +23,7 @@ This is very similar to what was done in the [previous chapter](../02-dynamicity
 To use this part of the walkthrough, run the following in this directory:
 
 ```bash
-./mock-stack-render.sh
+./mock-stack-generate.sh
 terragrunt run-all apply --terragrunt-non-interactive
 ```
 
@@ -66,13 +66,13 @@ farm/.terragrunt-stack/
     └── terragrunt.stack.hcl
 ```
 
-Each Stack is initially rendered into the `.terragrunt-stack` directory as a child directory with a `terragrunt.stack.hcl` file, then those Stacks are recursively rendered until all Stacks are rendered.
+Each Stack is initially generated into the `.terragrunt-stack` directory as a child directory with a `terragrunt.stack.hcl` file, and those Stacks are recursively generated until all Stacks are generated.
 
-This provides a mechanism for encapsulation, as you can see that the `coop-1` and `coop-2` Stacks are rendered independently with their own states, but reuse the definition in the [coop](../stacks/coop) Stack.
+This provides a mechanism for encapsulation, as you can see that the `coop-1` and `coop-2` Stacks are generated independently with their own states, but reuse the definition in the [coop](../stacks/coop) Stack.
 
 It also provides a mechanism for atomic updates to Stacks. Given that the entirety of the definition for a stack is stored elsewhere, it's possible to update the entire Stack by changing the value of the `source` attribute in the `terragrunt.stack.hcl` file, rather than editing individual `terragrunt.hcl` files.
 
-As an excercise, let's adjust the `source` attribute in the `coop_1` and `coop_2` configuration blocks so that they point to the `../../stacks/dynamic-coop` directory, and then re-run the `./mock-stack-render.sh` command.
+As an excercise, let's adjust the `source` attribute in the `coop_1` and `coop_2` configuration blocks so that they point to the `../../stacks/dynamic-coop` directory, and then re-run the `./mock-stack-generate.sh` command.
 
 Next, take a look at the error that occurs when running the `terragrunt run-all apply --terragrunt-non-interactive` command.
 
@@ -84,7 +84,7 @@ Call to function "find_in_parent_folders" failed: ParentFileNotFoundError: Could
 
 This is one of the downsides to the design discussed in [the last chapter](../02-dynamicity/README.md). Re-usable configurations may have certain expectations regarding how they will be instantiated, and there is no obvious interface for what they expect. One has to read the `terragrunt.hcl` file and reason about what is required to instantiate it.
 
-It's not clear that there's a way to handle this without some kind of interface that can be defined for `terragrunt.hcl` files, which can be inspected to determine what is required to instantiate them. This may also result in configurations that are unique to `terragrunt.hcl` files that are used in Stacks, which sacrifices some of the advantages of the current design.
+It's not clear that there's a way to handle this without some kind of interface that can be defined for `terragrunt.hcl` files, which can be inspected to determine the requirements to instantiate them. This may also result in configurations that are unique to `terragrunt.hcl` files that are used in Stacks, which sacrifices some of the advantages of the current design.
 
 To resolve this error, you can copy the file [coops.locals.hcl.todo](./farm/coops.locals.hcl.todo) to `./farm/coops.locals.hcl`:
 
@@ -98,11 +98,13 @@ Once that's done, you can re-run the apply, which should work now:
 terragrunt run-all apply --terragrunt-non-interactive
 ```
 
-You shouldn't have any errors anymore, and should see names for the chickens that align with the `coops.locals.hcl` file.
+You should now see names for the chickens that align with the values defined in the `coops.locals.hcl` file.
 
 ## Feedback Requested
 
 How do you feel about this trade-off? Is there another approach to defining the interface more cleanly that you would like to see?
 
 Do you see the current design as something that you would be able to work with in your own infrastructure, or do you see it as something that would block adoption of Stacks?
+
+How can this walkthrough be extended after this to answer more questions about how Stacks should work in Terragrunt? If you feel like there are interactions that are missing, please let me know. I'm happy to add more to this walkthrough to make it more useful.
 

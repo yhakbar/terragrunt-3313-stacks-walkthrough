@@ -2,11 +2,11 @@
 
 Terragrunt provides a level of abstraction over OpenTofu/Terraform that takes advantages of their strengths, while providing capabilities that scales what you can accomplish with them.
 
-At it's core, Terragrunt is an orchestrator. It leverages tools like OpenTofu to handle the execution of infrastructure updates via Infrastructure as Code, but provides tools that allows them to scale to the extent where organizations can define _all_ their infrastructure as code in a safe and efficient manner.
+At it's core, Terragrunt is an orchestrator. It leverages tools like OpenTofu to handle the underlying execution of infrastructure updates via Infrastructure as Code, but provides additional tooling so that organizations can feasibly define _all_ their infrastructure as code in a safe and efficient manner.
 
-To handle this, the core construct of Terragrunt introduces is the Unit. This is an entity defined using a `terragrunt.hcl` file, and controls one piece of infrastructure state using an OpenTofu/Terraform module.
+To handle this, the core construct of Terragrunt introduces is the Unit. This is an entity defined using a `terragrunt.hcl` file, and controls one atomic piece of infrastructure using an OpenTofu/Terraform module.
 
-While it can be used with `*.tf` files directly placed next to the `terragrunt.hcl` file on the filesystem, it is typically used in conjunction with modules that are reusable, and stored elsewhere. This allows multiple Units to take advantage of the same pattern defined using an OpenTofu module to efficiently reproduce the same infrastructure.
+While it can be used with `*.tf` files directly placed next to the `terragrunt.hcl` file on the filesystem, it is typically used in conjunction with modules that are reusable, and stored elsewhere (either in a different directory in the case of a monorepo, or in different repository(ies) in a polyrepo context). This allows multiple Units to take advantage of the same pattern defined using an OpenTofu module to efficiently reproduce the same infrastructure.
 
 ## Walkthrough
 
@@ -33,5 +33,5 @@ This concept is critical, as each Unit, defined entirely within a single `terrag
 
 It can be frustrating to define all that's required for a given Unit in a single file. There are often patterns that arise in how the same infrastructure is provisioned across environments that require more reuse.
 
-Terragrunt has some tooling that assists with this, but they come with their own problems, which will be discussed in the [next chapter](../03-includes-dependencies).
+Terragrunt has some tooling that assists with this, but this can come with its own problems. This is discussed in the [next chapter](../03-includes-dependencies).
 

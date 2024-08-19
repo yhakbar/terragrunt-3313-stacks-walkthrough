@@ -24,15 +24,15 @@ unit "chick_2" {
 }
 ```
 
-To simulate what Terragrunt will do when Stacks are available, a script has been comitted that will generate the appropriate `.terragrunt-stack` directory using a bash script.
+To simulate what Terragrunt will do when Stacks are available, a [script](./coop-1/mock-stack-generate.sh) has been provided that will generate the appropriate `.terragrunt-stack` directory using a simple bash script.
 
 ## Walkthrough
 
-Navigate to the [coop-1](./coop-1) directory, and execute the [mock-stack-render.sh](./coop-1/mock-stack-render.sh) script to see it simulate the `terragrunt stack render` command.
+Navigate to the [coop-1](./coop-1) directory, and execute the [mock-stack-generate.sh](./coop-1/mock-stack-generate.sh) script to see it simulate the `terragrunt stack generate` command.
 
 ```bash
 $ cd coop-1
-$ ./mock-stack-render.sh
+$ ./mock-stack-generate.sh
 $ tree .terragrunt-stack/
 .terragrunt-stack/
 ├── chicks
@@ -46,7 +46,7 @@ $ tree .terragrunt-stack/
     └── terragrunt.hcl
 ```
 
-As you can see, the directory structure is very similar to that demonstrated in the [previous chapter](../../03-includes-dependencies), without the need to have a `_shared` directory for code re-use. Because the entire Unit can be re-used with stacks, there is less benefit to relying on an external store of shared configurations.
+As you can see, the directory structure is very similar to that demonstrated in the [previous chapter](../../03-includes-dependencies), without the need to have a `_shared` directory for code re-use. Because the entire Unit can be re-used with stacks, there is less benefit to relying on an external store of shared partial configurations.
 
 You can also try out what it would be like to execute `terragrunt stack apply` on the stack. Running the following will apply those Units:
 
@@ -54,15 +54,15 @@ You can also try out what it would be like to execute `terragrunt stack apply` o
 $ terragrunt run-all apply --terragrunt-non-interactive
 ```
 
-> Note that if you don't run the [mock-stack-render.sh](./coop-1/mock-stack-render.sh) script, you won't have the `.terragrunt-stack` directory, and the `terragrunt run-all apply` command will ignore the `terragrunt.stack.hcl` file.
+> Note that if you don't run the [mock-stack-generate.sh](./coop-1/mock-stack-generate.sh) script, you won't have the `.terragrunt-stack` directory, and the `terragrunt run-all apply` command will ignore the `terragrunt.stack.hcl` file.
 >
-> This is an intentional part of the design here. Users of Terragrunt versions older than the one that supports Stacks will not have tooling to render the `.terragrunt-stack` directory, and will not be able to use the `terragrunt.stack.hcl` file.
+> This is an intentional part of the design here. Users of Terragrunt versions older than the one that will support Stacks won't have tooling to generate the `.terragrunt-stack` directory, and will not be able to use the `terragrunt.stack.hcl` file.
 >
-> Designing the functionality this way should prevent users from being surprised by the behavior of their Terragrunt configurations when they upgrade to a version that supports Stacks.
+> Designing the functionality this way should prevent users from being surprised by new Terragrunt configurations being applied when they upgrade to a version that supports Stacks. Additionally, users with CI/CD pipelines that have been built out without resepct to Stacks can still take advantage of them by manually running `terragrunt stack generate` locally and committing the `.terragrunt-stack` directory to their repository. From the perspective of the CI/CD pipeline, nothing has changed in how Terragrunt works.
 >
-> In the future, it's likely that `run-all` will automatically render the `.terragrunt-stack` directory if it doesn't exist, but for now, it's a manual, opt-in process.
+> In the future, it's likely that `run-all` will automatically generate the `.terragrunt-stack` directory if it doesn't exist, but for now, it's planned to be a manual, opt-in process.
 
-Similar to the previous chapter, you can also see that they leverage their position within the filesystem to drive metadata that can be used to determine where to store state:
+Similar to the previous chapter, you can also see that they still leverage their position within the filesystem to drive metadata that can be used to define where to store state:
 
 ```bash
 $ cd .terragrunt-stack/chicks/chick-1
@@ -99,19 +99,19 @@ last_name = "Chicken"
 
 ## Configuration Syntax
 
-These Units that have been generated through the mock stack render command don't use any syntax that's different than the average Terragrunt Unit. All techniques, functions and patterns used to author `terragrunt.hcl` files will directly transfer over to authoring Units as part of stacks.
+The Units generated here through the mock stack generate command don't use any syntax that's different than Terragrunt Units authored today. All techniques, functions and patterns used to author `terragrunt.hcl` files will directly transfer over to authoring Units as part of stacks.
 
-Note that the `unit` configuration blocks within the Stack definition specify a local `source`, and a `path`. The `source` will tell Terragrunt where to fetch content for use when rendering a stack, and the `path` will be used to determine where the Unit should be rendered in to the `.terragrunt-stack` directory.
+Note that the `unit` configuration blocks within the Stack definition specify a local `source`, and a `path`. The `source` will tell Terragrunt where to fetch content for use when generating a stack, and the `path` will be used to determine where the Unit should be generated in to the `.terragrunt-stack` directory.
 
-In this walkthrough, the reusable Unit definitions have been placed in a [units](../units) folder. For users of monorepos, this might be how they define Unit sources. For users leveraging remote Unit definitions, this is more likely to be something like the following:
+In this walkthrough, the reusable Unit definitions have been placed in a [units](../units) folder. For users of monorepos, a pattern like this might be how they define Unit sources. For users leveraging remote Unit definitions, this is more likely to be something like the following:
 
 ```
 github/yhakbar/terragrunt-3313-stacks-walkthrough//walkthrough/04-stacks/units/mother?ref=main
 ```
 
-Where the string is a valid `go-getter` string that references the Unit in a different git repository at a particular git reference. This is how Stacks will provide a mechanism for versioned Unit definitions.
+Where the string is a valid [go-getter](https://github.com/hashicorp/go-getter) string that references the Unit in a different git repository at a particular git reference. This is how Stacks will provide a mechanism for versioned Unit definitions.
 
-Users can maintain the same well tested version of an OpenTofu module that serves many generic use-cases, then use different versions of Unit by adjusting the ref.
+Users can maintain the same well tested version of an OpenTofu module that serves many generic use-cases, then use different versions of a Unit by adjusting the ref.
 
 e.g. 
 
@@ -125,7 +125,7 @@ to:
 github/yhakbar/terragrunt-3313-stacks-walkthrough//walkthrough/04-stacks/units/mother?ref=v0.0.2
 ```
 
-This is useful if the change you are propagating is not how resources are provisioned in the cloud, but how inputs, integrations and outputs are leveraged by a Terragrunt Unit.
+This is useful if the change you are propagating is not how resources are provisioned in the cloud, etc, but how inputs, integrations and outputs are leveraged by a Terragrunt Unit.
 
 Let's explore some aspects of how the [chick](../units/chick/terragrunt.hcl) Unit is defined:
 
@@ -171,17 +171,17 @@ There is still an `include "root"` at the top of the file. Terragrunt users are 
 
 ### `terraform`
 
-The `terraform` block is defined directly in this file, not shared from a central `_shared` directory. Given the fact that the whole Unit definition can be re-used, it's less beneficial in this context to do a secondary lookup for the `terraform` block. It can be defined directly in the `terragrunt.hcl` file once, and be re-used without splitting up configurations.
+The `terraform` block is defined directly in this file, not shared from a central `_shared` directory. Given the fact that the whole Unit definition can be re-used, it's less beneficial in this context to do a secondary lookup for the `terraform` block. It can be defined directly in the `terragrunt.hcl` file once, and be re-used without splitting up configurations via multiple `include`s.
 
 ### `dependency`
 
-The `dependency` blocks referenced here use relative paths to `mother` and `father`. Because users can specify a `path` attribute for the `unit` block, they can decide that any number of `chick` Units will be provisioned, and as long as the `mother` and `father` Units are rendered into the correct location, they will be able to fetch those dependencies as they would outside of the context of a Stack.
+The `dependency` blocks referenced here use relative paths to `mother` and `father`. Because users can specify a `path` attribute for the `unit` block, they can decide that any number of `chick` Units will be provisioned, and as long as the `mother` and `father` Units are generated into the correct location, they will be able to fetch those dependencies as they would outside of the context of a Stack.
 
-This proposal does not use any special syntax for configuring the integration between Units. As the Stack author, you know the patterns you expect for how a Stack will be rendered, and are expected to configure integrations in Unit definitions accordingly.
+This proposal does not use any special syntax for configuring the integration between Units. As the Stack author, you know the patterns you expect for how a Stack will be generated, and are expected to configure integrations in Unit definitions accordingly (like wiring the outputs of one dependency into the inputs for a Unit).
 
 ### `first_name`
 
-The `first_name` input for the `chick` Unit uses a simple convention of leveraging the name of the directory it is rendered into (`basename(get_terragrunt_dir())`) to determine an input for the Unit. This is not always a desireable way to configure inputs for a Stack, but it is simple, and works for a large number of use-cases.
+The `first_name` input for the `chick` Unit uses a simple convention of leveraging the name of the directory it is generated into (`basename(get_terragrunt_dir())`) to determine an input for the Unit. This is not always a desireable way to configure inputs for a Stack, but it is simple, and works for a large number of use-cases.
 
 What a user might expect to be able to do is to define an input for this Unit at the Stack level. The design considerations for that pattern will be explored in the [next chapter](../02-dynamicity).
 

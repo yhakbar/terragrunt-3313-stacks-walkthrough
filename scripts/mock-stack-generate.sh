@@ -12,7 +12,7 @@ debug() {
 	fi
 }
 
-render_unit() {
+generate_unit() {
 	local -r unit_source="$1"
 	local -r unit_path="$2"
 
@@ -21,7 +21,7 @@ render_unit() {
 	cp -R "./$unit_source/" ".terragrunt-stack/$unit_path/"
 }
 
-render_child_stack() {
+generate_child_stack() {
 	local -r stack_source="$1"
 	local -r stack_path="$2"
 
@@ -30,11 +30,11 @@ render_child_stack() {
 	cp -R "./$stack_source/" ".terragrunt-stack/$stack_path/"
 
 	pushd ".terragrunt-stack/$stack_path" >/dev/null
-	render_stack_hcl
+	generate_stack_hcl
 	popd >/dev/null
 }
 
-render_stack_hcl() {
+generate_stack_hcl() {
 	local unit_name=''
 	local unit_source
 	local unit_path
@@ -62,7 +62,7 @@ render_stack_hcl() {
 		fi
 
 		if [[ $line = *"}"* ]] && [[ "$unit_name" != "" ]]; then
-			render_unit "$unit_source" "$unit_path"
+			generate_unit "$unit_source" "$unit_path"
 			unit_name=""
 		fi
 
@@ -82,17 +82,17 @@ render_stack_hcl() {
 		fi
 
 		if [[ $line = *"}"* ]] && [[ "$stack_name" != "" ]]; then
-			render_child_stack "$stack_source" "$stack_path"
+			generate_child_stack "$stack_source" "$stack_path"
 			stack_name=""
 		fi
 	done <terragrunt.stack.hcl
 }
 
-render_stack() {
+generate_stack() {
 	local -r stack="$1"
 
 	pushd "$(dirname "$stack")" >/dev/null
-	render_stack_hcl
+	generate_stack_hcl
 	popd >/dev/null
 }
 
@@ -105,7 +105,7 @@ main() {
 
 	for stack in $(find_stacks); do
 		debug "Rendering stack $stack"
-		render_stack "$stack"
+		generate_stack "$stack"
 	done
 }
 

@@ -1,12 +1,12 @@
 # 03 - Includes & Dependencies
 
-To provide tooling to increase the reusability and integration of Terragrunt configurations, Terragrunt has a configuration blocks called `include` and `dependency`.
+To provide tooling to increase the reusability and integration of Terragrunt configurations, Terragrunt has configuration blocks [include](https://terragrunt.gruntwork.io/docs/reference/config-blocks-and-attributes/#include) and [dependency](https://terragrunt.gruntwork.io/docs/reference/config-blocks-and-attributes/#dependency).
 
 These allows users to share configurations across multiple Units and pass data from one Unit to another.
 
 ## Common Patterns
 
-At this time, it's also useful to discuss common patterns that have organically arrisen in how users write their Terragrunt configurations. Users aren't required to write their configurations this way, but it's usually a good idea to. It serves to address the majority of use-cases involved with managing infrastructure at scale.
+It's useful to discuss common patterns relating to these configurations that have organically arrisen in how users write their Terragrunt IaC. Users aren't required to write their configurations this way, but it's usually a good idea to. It serves to address the majority of use-cases involved with managing a lot of infrastructure at scale.
 
 Most Terragrunt users follow a pattern like the following:
 
@@ -32,7 +32,7 @@ tree
 
 Where the `terragrunt.hcl` file at the root of a directory has the configurations common to _all_ Units, a directory to the side (named `_shared` here) containing configurations relevant to some subset of Units, and then trees of Units that have some relationship to each other.
 
-This organizational pattern is especially useful in the context of IaC, as this provides a convenient mechanism for resolving common problems like determining where to store state. What most users do is use the path from the root `terragrunt.hcl` as the path for where remote state is stored in a state backend like S3. As a consequence, if you want to provision new infrastructure, or work on a piece of infrastructure in a particular piece of segmented state, all you have to do is navigate to the relevant directory in the filesystem and use the `terragrunt` CLI there.
+This organizational pattern is especially useful in the context of IaC, as this provides a convenient mechanism for addressing common problems like determining where to store state. What most users do is use the path from the root `terragrunt.hcl` as the path for where remote state is stored in a state backend like S3. As a consequence, if you want to provision new infrastructure, or work on a piece of infrastructure in a particular piece of segmented state, all you have to do is navigate to the relevant directory in the filesystem and use the `terragrunt` CLI there.
 
 Similarly, if Units need to acquire data from other Units, they can use `dependency` blocks to have Terragrunt handle message passing between Units. Each `terragrunt.hcl` file explicitly indicates where it expects to pull data from, and what data it expects to pull. They can also use `include` blocks to explicitly indicate that they are going to merge in configurations defiend elsewhere.
 
@@ -83,6 +83,8 @@ last_name = "Chicken"
 
 Shows how the `lineage` attribute is set to the path of the Unit in the filesystem. This is a common pattern that users use to determine where to store state for the Unit.
 
+Navigating to a different Unit, `chick-1`, and running the following:
+
 ```bash
 $ cd ../chicks/chick-1
 $ terragrunt show
@@ -128,7 +130,7 @@ Copying the `coop-1` directory to a new `coop-2` results in all the infrastructu
 cp -R coop-1 coop-2
 ```
 
-This is replicating a "Stack" of infrastructure in Terragrunt.
+This is replicating a "Stack" of infrastructure in Terragrunt (I'll try to keep this version of a "Stack" quoted to differentiate it from the first class construct introduced to handle it more conveniently later).
 
 ## Limitations
 
@@ -148,15 +150,12 @@ include "chicken" {
 include "chick" {
 	path = "${dirname(find_in_parent_folders("terragrunt.hcl"))}/_shared/chick.hcl"
 }
-
-inputs = {
-	first_name = "Junior"
-}
+// ...
 ```
 
-This can be problematic at scale, as it can be difficult to manage updates in this situation.
+This can be problematic at scale, as it can be difficult to propagate updates across large numbers of "Stacks" in this situation.
 
-e.g. Say you had to update the [chick.hcl](./_shared/chick.hcl) file. You would also have to trigger an update in every Unit that references that configuration. You would also have to decide _how_ you wanted to trigger that update without anything changing in IaC. As soon as the `chick.hcl` file is updated, the next update to every Unit referencing it would result in a corresponding change.
+e.g. Say you had to update the shared [chick.hcl](./_shared/chick.hcl) file. You would also have to trigger an update in every Unit that references that configuration. You would also have to decide _how_ you wanted to trigger that update without anything changing in IaC. As soon as the `chick.hcl` file is updated, the next update to every Unit referencing it would result in a corresponding change. Do you want to update all Units at once? Do you want to update them one by one? Do you want to update them in a particular order? None of that logic would be codified.
 
 In addition, any change to the structure of the Stack can be difficult to manage. If you wanted to add, remove or rename a Unit within the Stack, you would have to find every instance of the Stack and manually update it. This includes changes to how Units depend on each other if their inputs or outputs change.
 
