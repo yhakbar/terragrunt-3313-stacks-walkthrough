@@ -55,8 +55,11 @@ $ terragrunt run-all apply --terragrunt-non-interactive
 ```
 
 > Note that if you don't run the [mock-stack-render.sh](./coop-1/mock-stack-render.sh) script, you won't have the `.terragrunt-stack` directory, and the `terragrunt run-all apply` command will ignore the `terragrunt.stack.hcl` file.
+>
 > This is an intentional part of the design here. Users of Terragrunt versions older than the one that supports Stacks will not have tooling to render the `.terragrunt-stack` directory, and will not be able to use the `terragrunt.stack.hcl` file.
+>
 > Designing the functionality this way should prevent users from being surprised by the behavior of their Terragrunt configurations when they upgrade to a version that supports Stacks.
+>
 > In the future, it's likely that `run-all` will automatically render the `.terragrunt-stack` directory if it doesn't exist, but for now, it's a manual, opt-in process.
 
 Similar to the previous chapter, you can also see that they leverage their position within the filesystem to drive metadata that can be used to determine where to store state:
