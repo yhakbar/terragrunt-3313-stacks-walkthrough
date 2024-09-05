@@ -16,3 +16,9 @@ The contents of the [units](./units) and [stacks](./stacks) directories are used
 
 To get started, navigate to [01-basic](./01-basic).
 
+## Next Steps
+
+This chapter is pretty abstract, and uses examples that don't relate to real infrastructure that might be provisioned using Terragrunt.
+
+[The next chapter](../05-aws) uses the same concepts in a more practical context.
+

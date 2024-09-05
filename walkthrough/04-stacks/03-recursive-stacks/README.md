@@ -108,3 +108,7 @@ Do you see the current design as something that you would be able to work with i
 
 How can this walkthrough be extended after this to answer more questions about how Stacks should work in Terragrunt? If you feel like there are interactions that are missing, please let me know. I'm happy to add more to this walkthrough to make it more useful.
 
+## Next Steps
+
+See the [next chapter](../../05-aws) for concrete examples of how Stacks can be used to manage real resources in AWS.
+
