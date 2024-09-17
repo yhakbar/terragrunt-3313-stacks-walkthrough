@@ -79,8 +79,12 @@ When writing up this walkthrough, I did so in the following order:
 1. I created the `live/dev/services/api/terragrunt.hcl` file and created a `live/dev/services/api/main.tf` file with the minimal configuration to create a Lambda function.
 
    I also added the `src/index.mjs` file to the root of the project to serve as the source code for the Lambda function, and the `scripts/package.sh` script to package the source code.
-   
+
    This allowed me to rapidly iterate on the Lambda function configuration and test it in isolation with plans and applies.
+
+   This is how Terragrunt is [taught on the website](https://terragrunt.gruntwork.io/docs/getting-started/quick-start/), and is a good way to adopt Terragrunt if you're new to it.
+
+   Some folks that are experienced with Terragrunt might skip this step and go straight to the next step, as Terragrunt is most useful in the context where you're re-using small modules of OpenTofu/Terraform code, but I find this step useful for folks that are new to Terragrunt.
 
 2. I then refactored out the OpenTofu configuration into the `modules/api` directory, and updated the `live/dev/services/api/terragrunt.hcl` file to reference it.
 

@@ -98,5 +98,13 @@ terragrunt run-all destroy --terragrunt-non-interactive
 
 ## Next Steps
 
+These `terragrunt.stack.hcl` files can actually allow for even less code duplication, which will be demonstrated in the following chapters.
+
+This simply demonstrates introducing one layer of abstraction over repeated use of `terragrunt.hcl` files, which many users are currently maintaining, to consolidated `terragrunt.stack.hcl` files. We've taken multiple Units in both the `dev` and `prod` environments and consolidated them into a single Stack per environment.
+
+Some users may prefer to stop here, while others may want to introduce more abstraction in their `terragrunt.stack.hcl` files. Ultimately, Terragrunt aims to empower users to make architectural decisions that best fit the needs of their infrastructure, and the design of Stacks is intended to be flexible enough to accommodate a wide range of approaches.
+
+By the end of the [05-aws](../) walkthrough, you will have seen how Stacks can also be defined once and re-used in multiple locations, which can be useful for defining common infrastructure patterns that are used across multiple environments.
+
 The [next chapter](../03-no-shared/) will demonstrate how a little more refactoring can further reduce the amount of code that has to be maintained.
 
