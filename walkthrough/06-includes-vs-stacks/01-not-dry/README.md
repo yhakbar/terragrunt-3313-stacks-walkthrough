@@ -43,7 +43,7 @@ locals {
 
 	dist_dir       = "${local.parent_dir}/dist"
 	source_dir     = "${local.parent_dir}/src"
-	
+
 	package_script = "${local.parent_dir}/scripts/package.sh"
 
 	cur_dir_name = basename(get_terragrunt_dir())
@@ -63,7 +63,7 @@ dependency "db" {
 
 	# Mock outputs allow us to continue to plan on the apply of the api module
 	# even though the db module has not yet been applied.
-	mock_outputs_allowed_terraform_commands = ["plan", "destroy"] 
+	mock_outputs_allowed_terraform_commands = ["plan", "destroy"]
 	mock_outputs = {
 		name = "mock-table"
 		arn  = "arn:aws:dynamodb:us-west-2:123456789012:table/mock-table"
@@ -80,7 +80,7 @@ inputs = {
 }
 ```
 
-While there is some code re-use here, there isn't much. The `include "root` block at the top of the repository is used to ensure that there's common state configurations for all units, and the `dist`, `src`, `scripts` and `modules` directories referenced relative to the `root.hcl` file are shared as well.
+While there is some code re-use here, there isn't much. The `include "root"` block at the top of the repository is used to ensure that there's common state configurations for all units, and the `dist`, `src`, `scripts` and `modules` directories referenced relative to the `root.hcl` file are shared as well.
 
 What isn't shared is the actual configuration of the units themselves. The `terraform` block, `dependency` block, and `inputs` block are all duplicated across each unit. This includes the `-dev` suffix applied to the `name` attribute, which has to be set in each unit to reflect the appropriate environment.
 

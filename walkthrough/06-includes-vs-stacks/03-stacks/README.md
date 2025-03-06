@@ -37,7 +37,7 @@ locals {
 
 	dist_dir       = "./dist"
 	source_dir     = "./src"
-	
+
 	package_script = "./package.sh"
 
 	cur_dir_name = basename(get_terragrunt_dir())
@@ -57,7 +57,7 @@ dependency "db" {
 
 	# Mock outputs allow us to continue to plan on the apply of the api module
 	# even though the db module has not yet been applied.
-	mock_outputs_allowed_terraform_commands = ["plan", "destroy"] 
+	mock_outputs_allowed_terraform_commands = ["plan", "destroy"]
 	mock_outputs = {
 		name = "mock-table"
 		arn  = "arn:aws:dynamodb:us-west-2:123456789012:table/mock-table"
@@ -122,6 +122,8 @@ Configuration files for units like `package.sh`, which are not exactly unit conf
 
 ## Conclusion
 
-As stated in the other patterns, this is not necessarily a _better_ pattern for all teams. Terragrunt maintainers are introducing this as a new pattern because we think it'll be a better fit for more teams and scales really well, but it's not a one-size-fits-all solution. Teams that have already invested heavily in the `_envcommon` pattern might not see a lot of value in switching to the `terragrunt.stack.hcl` pattern immediately. Teams that are just starting out with Terragrunt might find the "Not DRY" pattern easier to reason about, and easier to get started with while their team learns how to read Terragrunt configurations. Teams that are struggling with scaling using the `_envcommon` pattern might find the "Stacks" pattern to be a more flexible way to achieve the same goals, without the tight coupling that the `include` blocks in the `_envcommon` pattern introduce.
+In general, the "Stacks" pattern is the best way for most teams to manage their Terragrunt configurations. It's a more scalable and flexible way to manage configurations at scale, and it's a good fit for what the majority of teams are trying to achieve with Terragrunt. It provides tooling for code reuse, while also providing a way to manage stack-specific configurations for different environments in a way that's easy to reason about. The fact that it _also_ provides a way to stop using the `include` blocks in the "_envcommon" pattern is a nice bonus. Includes are powerful, but the "_envcommon" pattern has been a source of confusion and pain when teams are scaling up their infrastructure estates. Moving away from the "_envcommon" pattern makes it so that includes are only used when they're actually needed, and not as a default way to manage large scale code reuse.
+
+As stated in the other patterns, this is not necessarily a _better_ pattern for all teams. Terragrunt maintainers are introducing this as a new pattern because we think it'll be a better fit for the vast majority of teams, and it scales really well, but it's not a one-size-fits-all solution. Teams that have already invested heavily in the `_envcommon` pattern might not see a lot of value in switching to the `terragrunt.stack.hcl` pattern immediately. Teams that are just starting out with Terragrunt might find the "Not DRY" pattern easier to reason about, and easier to get started with while their team learns how to read Terragrunt configurations. Teams that are struggling with scaling using the `_envcommon` pattern might find the "Stacks" pattern to be a more flexible way to achieve the same goals, without the tight coupling that the `include` blocks in the `_envcommon` pattern introduce.
 
 In-fact, most teams will need to combine elements of these different patterns to achieve their goals with Terragrunt. The `terragrunt.stack.hcl` file is meant to be one more tool in the toolbelt of platform engineers, and while it makes it less necessary to use the `_envcommon` pattern, there are aspects of the pattern that a lot of teams will still end up using. Next, let's explore [combining patterns](../04-combining-patterns) to see how using different parts of these patterns can create a different approach to managing infrastructure with Terragrunt.
